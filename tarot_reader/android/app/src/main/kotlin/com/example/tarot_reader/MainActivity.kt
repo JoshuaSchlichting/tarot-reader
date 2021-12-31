@@ -1,0 +1,6 @@
+package com.example.tarot_reader
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity: FlutterActivity() {
+}
