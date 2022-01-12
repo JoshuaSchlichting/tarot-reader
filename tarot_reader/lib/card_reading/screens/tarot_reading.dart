@@ -22,7 +22,7 @@ class TarotReadingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO: get available image names from tarot-images.json
+    // TODO: definitely want to wait here before calling get card data
     List<TarotCardData> availableCards = _getCardData(ref);
     return Scaffold(
       appBar: AppBar(
