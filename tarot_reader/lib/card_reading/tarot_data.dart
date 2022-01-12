@@ -34,7 +34,6 @@ class TarotDataProcessor {
   late List<TarotCardData> _data;
 
   TarotDataProcessor(Map<String, dynamic> data) {
-    // TODO: See what's up here, cards should be a List
     List<Map> cardObjs = data["cards"] as List<Map>;
     for (var element in cardObjs) {
       _data.add(TarotCardData(
