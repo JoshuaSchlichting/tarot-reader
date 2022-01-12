@@ -1,7 +1,10 @@
 import 'dart:math' as math;
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tarot_reader/data_access_layer.dart' show imagePathProvider;
+import 'package:tarot_reader/data_access_layer.dart'
+    show imagePathProvider, cardDataProvider;
+import 'package:tarot_reader/card_reading/tarot_data.dart'
+    show TarotDataProcessor;
 import 'package:flutter/material.dart';
 
 class TarotReadingScreen extends ConsumerWidget {
@@ -9,6 +12,7 @@ class TarotReadingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // TODO: get available image names from tarot-images.json
     AsyncValue<List<String>> availableImageNames = ref.watch(imagePathProvider);
     return Scaffold(
       appBar: AppBar(
@@ -49,21 +53,46 @@ class CardDisplay extends StatelessWidget {
   }
 }
 
-class Card extends StatelessWidget {
+class Card extends ConsumerWidget {
   final Widget image;
   final String title;
   const Card({Key? key, required this.image, required this.title})
       : super(key: key);
+
+  String getCardText(String cardName, WidgetRef ref) {
+    AsyncValue<Map<String, dynamic>> jsonPayload = ref.watch(cardDataProvider);
+
+    Map<String, dynamic> data = TarotDataProcessor(jsonPayload.when(
+      data: (data) => data,
+      loading: () => {},
+      error: (error, stackTrance) => {},
+    )).getCardData(cardName);
+    for (final key in data.keys) {
+      if (key == "title") {
+        return data[key];
+      }
+    }
+
+    return "Card $cardName not found.";
+  }
+
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: image,
-      decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.black,
-          ),
-          borderRadius: const BorderRadius.all(Radius.circular(50))),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+        onTap: () => {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Text(getCardText(title, ref))))
+            },
+        child: Container(
+          child: image,
+          decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.black,
+              ),
+              borderRadius: const BorderRadius.all(Radius.circular(50))),
+        ));
   }
 }
 
@@ -96,6 +125,8 @@ class TarotCardFactory {
   }
 
   String _getRandomCardFilename() {
+    // TODO: Get a random "card" json object from tarot-images.json,
+    // rather than just the filename, as is being done here
     if (availableImageNames.isEmpty) {
       return "";
     }
