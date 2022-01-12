@@ -10,10 +10,21 @@ import 'package:flutter/material.dart';
 class TarotReadingScreen extends ConsumerWidget {
   const TarotReadingScreen({Key? key}) : super(key: key);
 
+  List<Map<String, dynamic>> _getCardData(WidgetRef ref) {
+    AsyncData<Map<String, dynamic>> data = ref.watch(cardDataProvider);
+    
+    var rawCardData = data.when(
+      data: (data) => data,
+      error: (error, stackTrace) => {} as Map<String, dynamic>,
+      loading: () => {} as Map<String, dynamic>,
+    );
+    return TarotDataProcessor(rawCardData).availableImages;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TODO: get available image names from tarot-images.json
-    AsyncValue<List<String>> availableImageNames = ref.watch(imagePathProvider);
+    var availableImageNames = 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tarot Reading'),
@@ -24,16 +35,7 @@ class TarotReadingScreen extends ConsumerWidget {
           // CircularProgressIndicator(),
           ...TarotCardFactory(
               deckType: "marseille",
-              availableImageNames: availableImageNames.when(
-                data: (data) => data,
-                loading: () => [
-                  // Temp assets for during load
-                  "assets/images/decks/marseille/a01.jpg",
-                  "assets/images/decks/marseille/a02.jpg",
-                  "assets/images/decks/marseille/a03.jpg",
-                ],
-                error: (error, stackTrance) => [],
-              )).getCards(3),
+              availableCardData: _getCardData(ref)).getCards(3),
         ])),
       ),
     );
@@ -98,10 +100,10 @@ class Card extends ConsumerWidget {
 
 class TarotCardFactory {
   final String deckType;
-  List<String> availableImageNames = [];
+  List<Map<String, dynamic>> availableCardData = [];
   List<String> _alreadyDrawn = [];
 
-  TarotCardFactory({required this.deckType, required this.availableImageNames});
+  TarotCardFactory({required this.deckType, required this.availableCardData});
 
   List<Card> getCards(int numberOfCards) {
     debugPrint(
@@ -127,12 +129,12 @@ class TarotCardFactory {
   String _getRandomCardFilename() {
     // TODO: Get a random "card" json object from tarot-images.json,
     // rather than just the filename, as is being done here
-    if (availableImageNames.isEmpty) {
+    if (availableCardData.isEmpty) {
       return "";
     }
     while (true) {
-      int randomIndex = math.Random().nextInt(availableImageNames.length);
-      String randomCardName = availableImageNames[randomIndex];
+      int randomIndex = math.Random().nextInt(availableCardData.length);
+      Map<String, dynamic> randomCard = availableCardData[randomIndex];
 
       if (!_alreadyDrawn.contains(randomCardName)) {
         _alreadyDrawn.add(randomCardName);
