@@ -120,8 +120,6 @@ class TarotCardFactory {
   }
 
   TarotCardData _getRandomCardData() {
-    // TODO: Get a random "card" json object from tarot-images.json,
-    // rather than just the filename, as is being done here
     while (true) {
       int randomIndex = math.Random().nextInt(availableCardData.length);
       TarotCardData randomCard = availableCardData[randomIndex];
