@@ -1,22 +1,21 @@
 import 'dart:math' as math;
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tarot_reader/data_access_layer.dart'
-    show imagePathProvider, cardDataProvider;
+import 'package:tarot_reader/data_access_layer.dart' show cardDataProvider;
 import 'package:tarot_reader/card_reading/tarot_data.dart'
-    show TarotDataProcessor;
+    show TarotCardData, TarotDataProcessor;
 import 'package:flutter/material.dart';
 
 class TarotReadingScreen extends ConsumerWidget {
   const TarotReadingScreen({Key? key}) : super(key: key);
 
-  List<Map<String, dynamic>> _getCardData(WidgetRef ref) {
-    AsyncData<Map<String, dynamic>> data = ref.watch(cardDataProvider);
-    
-    var rawCardData = data.when(
+  List<TarotCardData> _getCardData(WidgetRef ref) {
+    AsyncValue<Map<String, dynamic>> data = ref.watch(cardDataProvider);
+
+    Map<String, dynamic> rawCardData = data.when(
       data: (data) => data,
-      error: (error, stackTrace) => {} as Map<String, dynamic>,
-      loading: () => {} as Map<String, dynamic>,
+      error: (error, stackTrace) => {},
+      loading: () => {},
     );
     return TarotDataProcessor(rawCardData).availableImages;
   }
@@ -24,7 +23,7 @@ class TarotReadingScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TODO: get available image names from tarot-images.json
-    var availableImageNames = 
+    List<TarotCardData> availableCards = _getCardData(ref);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tarot Reading'),
@@ -34,8 +33,8 @@ class TarotReadingScreen extends ConsumerWidget {
             child: Column(children: [
           // CircularProgressIndicator(),
           ...TarotCardFactory(
-              deckType: "marseille",
-              availableCardData: _getCardData(ref)).getCards(3),
+                  deckType: "marseille", availableCardData: availableCards)
+              .getCards(3),
         ])),
       ),
     );
@@ -64,18 +63,12 @@ class Card extends ConsumerWidget {
   String getCardText(String cardName, WidgetRef ref) {
     AsyncValue<Map<String, dynamic>> jsonPayload = ref.watch(cardDataProvider);
 
-    Map<String, dynamic> data = TarotDataProcessor(jsonPayload.when(
+    TarotCardData data = TarotDataProcessor(jsonPayload.when(
       data: (data) => data,
       loading: () => {},
       error: (error, stackTrance) => {},
     )).getCardData(cardName);
-    for (final key in data.keys) {
-      if (key == "title") {
-        return data[key];
-      }
-    }
-
-    return "Card $cardName not found.";
+    return data.toString();
   }
 
   @override
@@ -100,8 +93,8 @@ class Card extends ConsumerWidget {
 
 class TarotCardFactory {
   final String deckType;
-  List<Map<String, dynamic>> availableCardData = [];
-  List<String> _alreadyDrawn = [];
+  List<TarotCardData> availableCardData = [];
+  List<TarotCardData> _alreadyDrawn = [];
 
   TarotCardFactory({required this.deckType, required this.availableCardData});
 
@@ -126,25 +119,22 @@ class TarotCardFactory {
     return cards;
   }
 
-  String _getRandomCardFilename() {
+  TarotCardData _getRandomCardData() {
     // TODO: Get a random "card" json object from tarot-images.json,
     // rather than just the filename, as is being done here
-    if (availableCardData.isEmpty) {
-      return "";
-    }
     while (true) {
       int randomIndex = math.Random().nextInt(availableCardData.length);
-      Map<String, dynamic> randomCard = availableCardData[randomIndex];
+      TarotCardData randomCard = availableCardData[randomIndex];
 
-      if (!_alreadyDrawn.contains(randomCardName)) {
-        _alreadyDrawn.add(randomCardName);
-        return randomCardName;
+      if (!_alreadyDrawn.contains(randomCard)) {
+        _alreadyDrawn.add(randomCard);
+        return randomCard;
       }
     }
   }
 
   Widget _getRandomCardImage() {
-    String cardName = _getRandomCardFilename();
+    String cardName = _getRandomCardData().name;
 
     return Image(image: AssetImage(cardName));
   }

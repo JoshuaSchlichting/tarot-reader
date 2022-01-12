@@ -21,6 +21,5 @@ final cardDataProvider = FutureProvider<Map<String, dynamic>>((ref) async {
       await rootBundle.loadString('assets/images/decks/tarot-images.json');
 
   Map<String, dynamic> data = json.decode(jsonPayload);
-
   return data;
 });
