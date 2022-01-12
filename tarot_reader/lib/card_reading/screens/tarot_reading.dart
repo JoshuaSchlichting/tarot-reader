@@ -1,6 +1,7 @@
 import 'dart:math' as math;
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tarot_reader/data_access_layer.dart';
+import 'package:tarot_reader/data_access_layer.dart' show imagePathProvider;
 import 'package:flutter/material.dart';
 
 class TarotReadingScreen extends ConsumerWidget {
@@ -49,7 +50,7 @@ class CardDisplay extends StatelessWidget {
 }
 
 class Card extends StatelessWidget {
-  final Image image;
+  final Widget image;
   final String title;
   const Card({Key? key, required this.image, required this.title})
       : super(key: key);
@@ -79,8 +80,14 @@ class TarotCardFactory {
 
     final List<Card> cards = [];
     for (int i = 0; i < numberOfCards; i++) {
+      double rotateAngle = 0;
+      if (Random().nextBool()) {
+        rotateAngle = 91.11;
+      }
+
       cards.add(Card(
-        image: _getRandomCardImage(),
+        image:
+            Transform.rotate(child: _getRandomCardImage(), angle: rotateAngle),
         title: "TODO: get card titles",
       ));
     }
@@ -103,8 +110,9 @@ class TarotCardFactory {
     }
   }
 
-  Image _getRandomCardImage() {
+  Widget _getRandomCardImage() {
     String cardName = _getRandomCardFilename();
+
     return Image(image: AssetImage(cardName));
   }
 }
