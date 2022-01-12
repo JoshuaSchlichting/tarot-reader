@@ -10,7 +10,7 @@ final imagePathProvider = FutureProvider<List<String>>((ref) async {
   final Map<String, dynamic> manifestMap = json.decode(manifestContent);
 
   final imagePaths = manifestMap.keys
-      .where((String key) => key.contains('assets/images/decks/marseille/'))
+      .where((String key) => key.contains('assets/images/decks/rider-waite/'))
       .toList();
 
   return imagePaths;
