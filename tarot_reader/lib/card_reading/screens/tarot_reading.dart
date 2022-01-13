@@ -1,15 +1,23 @@
 import 'dart:math' as math;
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tarot_reader/data_access_layer.dart' show imagePathProvider;
+import 'package:tarot_reader/data_access_layer.dart' show cardDataProvider;
+import 'package:tarot_reader/card_reading/tarot_data.dart'
+    show TarotCardData, TarotDataProcessor;
 import 'package:flutter/material.dart';
 
 class TarotReadingScreen extends ConsumerWidget {
-  const TarotReadingScreen({Key? key}) : super(key: key);
+  final Map<String, dynamic> rawData;
+  const TarotReadingScreen({Key? key, required this.rawData}) : super(key: key);
+
+  List<TarotCardData> _getCardData() {
+    return TarotDataProcessor(rawData).availableImages;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue<List<String>> availableImageNames = ref.watch(imagePathProvider);
+    // TODO: definitely want to wait here before calling get card data
+    List<TarotCardData> availableCards = _getCardData();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tarot Reading'),
@@ -19,17 +27,8 @@ class TarotReadingScreen extends ConsumerWidget {
             child: Column(children: [
           // CircularProgressIndicator(),
           ...TarotCardFactory(
-              deckType: "marseille",
-              availableImageNames: availableImageNames.when(
-                data: (data) => data,
-                loading: () => [
-                  // Temp assets for during load
-                  "assets/images/decks/marseille/a01.jpg",
-                  "assets/images/decks/marseille/a02.jpg",
-                  "assets/images/decks/marseille/a03.jpg",
-                ],
-                error: (error, stackTrance) => [],
-              )).getCards(3),
+                  deckType: "marseille", availableCardData: availableCards)
+              .getCards(3),
         ])),
       ),
     );
@@ -49,30 +48,44 @@ class CardDisplay extends StatelessWidget {
   }
 }
 
-class Card extends StatelessWidget {
+class Card extends ConsumerWidget {
   final Widget image;
   final String title;
-  const Card({Key? key, required this.image, required this.title})
+  final String text;
+  const Card(
+      {Key? key, required this.image, required this.title, required this.text})
       : super(key: key);
+
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: image,
-      decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.black,
-          ),
-          borderRadius: const BorderRadius.all(Radius.circular(50))),
-    );
+  Widget build(BuildContext context, WidgetRef ref) {
+    return GestureDetector(
+        onTap: () => {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Center(
+                              child: Text(
+                            text,
+                            style: TextStyle(fontSize: 20),
+                          ))))
+            },
+        child: Container(
+          child: image,
+          decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.black,
+              ),
+              borderRadius: const BorderRadius.all(Radius.circular(50))),
+        ));
   }
 }
 
 class TarotCardFactory {
   final String deckType;
-  List<String> availableImageNames = [];
-  List<String> _alreadyDrawn = [];
+  List<TarotCardData> availableCardData = [];
+  List<TarotCardData> _alreadyDrawn = [];
 
-  TarotCardFactory({required this.deckType, required this.availableImageNames});
+  TarotCardFactory({required this.deckType, required this.availableCardData});
 
   List<Card> getCards(int numberOfCards) {
     debugPrint(
@@ -84,35 +97,31 @@ class TarotCardFactory {
       if (Random().nextBool()) {
         rotateAngle = 91.11;
       }
-
+      TarotCardData cardData = _getRandomCardData();
       cards.add(Card(
-        image:
-            Transform.rotate(child: _getRandomCardImage(), angle: rotateAngle),
-        title: "TODO: get card titles",
-      ));
+          image: Transform.rotate(
+              child: _getCardImage(cardData), angle: rotateAngle),
+          title: "TODO: get card titles",
+          text: cardData.name ?? "no name found"));
     }
     _alreadyDrawn = [];
     return cards;
   }
 
-  String _getRandomCardFilename() {
-    if (availableImageNames.isEmpty) {
-      return "";
-    }
+  TarotCardData _getRandomCardData() {
     while (true) {
-      int randomIndex = math.Random().nextInt(availableImageNames.length);
-      String randomCardName = availableImageNames[randomIndex];
+      int randomIndex = math.Random().nextInt(availableCardData.length);
+      TarotCardData randomCard = availableCardData[randomIndex];
 
-      if (!_alreadyDrawn.contains(randomCardName)) {
-        _alreadyDrawn.add(randomCardName);
-        return randomCardName;
+      if (!_alreadyDrawn.contains(randomCard)) {
+        _alreadyDrawn.add(randomCard);
+        return randomCard;
       }
     }
   }
 
-  Widget _getRandomCardImage() {
-    String cardName = _getRandomCardFilename();
-
-    return Image(image: AssetImage(cardName));
+  Widget _getCardImage(TarotCardData cardData) {
+    return Image(
+        image: AssetImage("assets/images/decks/rider-waite/${cardData.img}"));
   }
 }

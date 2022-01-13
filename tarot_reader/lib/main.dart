@@ -3,6 +3,8 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:tarot_reader/card_reading/screens/tarot_reading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:tarot_reader/data_access_layer.dart' show cardDataProvider;
+
 const String _appTitle = "Tarot Reader";
 
 void main() {
@@ -25,21 +27,16 @@ class MyApp extends ConsumerWidget {
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
-
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    AsyncValue<Map<String, dynamic>> cardData = ref.watch(cardDataProvider);
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
       ),
       body: Center(
         child: Column(
@@ -51,7 +48,14 @@ class _MyHomePageState extends State<MyHomePage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const TarotReadingScreen()))
+                              builder: (context) => cardData.when(
+                                    data: (data) => TarotReadingScreen(
+                                      rawData: data,
+                                    ),
+                                    error: (error, stackTrace) =>
+                                        Text("$error $stackTrace"),
+                                    loading: () => const Text("Loading..."),
+                                  )))
                     },
                 child: const Text('Draw 3!'))
           ],
