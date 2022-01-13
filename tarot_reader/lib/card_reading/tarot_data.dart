@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class TarotCardData {
   String? name;
   int? number;
@@ -28,6 +30,26 @@ class TarotCardData {
       this.elemental,
       this.mythicalSpiritual,
       this.questionsToAsk});
+
+  String toJson() {
+    Map<String, dynamic> payloadMap = {
+      'name': name,
+      'number': number,
+      'arcana': arcana,
+      'suit': suit,
+      'img': img,
+      'fortunteTelling': fortunteTelling,
+      'keywords': keywords,
+      'meanings': meanings,
+      'archetype': archetype,
+      'hebrewAlphabet': hebrewAlphabet,
+      'numerology': numerology,
+      'elemental': elemental,
+      'mythicalSpiritual': mythicalSpiritual,
+      'questionsToAsk': questionsToAsk
+    };
+    return jsonEncode(payloadMap);
+  }
 }
 
 class TarotDataProcessor {

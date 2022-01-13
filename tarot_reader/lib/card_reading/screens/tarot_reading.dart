@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -98,11 +99,12 @@ class TarotCardFactory {
         rotateAngle = 91.11;
       }
       TarotCardData cardData = _getRandomCardData();
+      ;
       cards.add(Card(
           image: Transform.rotate(
               child: _getCardImage(cardData), angle: rotateAngle),
           title: "TODO: get card titles",
-          text: cardData.name ?? "no name found"));
+          text: cardData.toJson()));
     }
     _alreadyDrawn = [];
     return cards;
