@@ -1,44 +1,44 @@
 class TarotCardData {
-  late final String name;
-  late final int number;
-  late final String arcana;
-  late final String suit;
-  late final String img;
-  late final List<String> fortunteTelling;
-  late final List<String> keywords;
-  late final List<Map<String, List<String>>> meanings;
-  late final String archetype;
-  late final String hebrewAlphabet;
-  late final String numerology;
-  late final String elemental;
-  late final String mythicalSpiritual;
-  late final List<String> questionsToAsk;
+  String? name;
+  int? number;
+  String? arcana;
+  String? suit;
+  String? img;
+  List<dynamic>? fortunteTelling;
+  List<dynamic>? keywords;
+  var meanings;
+  String? archetype;
+  String? hebrewAlphabet;
+  String? numerology;
+  String? elemental;
+  String? mythicalSpiritual;
+  List<String>? questionsToAsk;
   TarotCardData(
-      {required this.name,
-      required this.number,
-      required this.arcana,
-      required this.suit,
-      required this.img,
-      required this.fortunteTelling,
-      required this.keywords,
-      required this.meanings,
-      required this.archetype,
-      required this.hebrewAlphabet,
-      required this.numerology,
-      required this.elemental,
-      required this.mythicalSpiritual,
-      required this.questionsToAsk});
+      {this.name,
+      this.number,
+      this.arcana,
+      this.suit,
+      this.img,
+      this.fortunteTelling,
+      this.keywords,
+      this.meanings,
+      this.archetype,
+      this.hebrewAlphabet,
+      this.numerology,
+      this.elemental,
+      this.mythicalSpiritual,
+      this.questionsToAsk});
 }
 
 class TarotDataProcessor {
-  late List<TarotCardData> _data;
+  List<TarotCardData> _data = [];
 
   TarotDataProcessor(Map<String, dynamic> data) {
-    List<Map> cardObjs = data["cards"] as List<Map>;
+    List cardObjs = data["cards"] as List;
     for (var element in cardObjs) {
       _data.add(TarotCardData(
         name: element["name"],
-        number: element["number"],
+        number: int.parse(element["number"]),
         arcana: element["arcana"],
         suit: element["suit"],
         img: element["img"],
