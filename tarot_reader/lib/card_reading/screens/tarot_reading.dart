@@ -16,7 +16,6 @@ class TarotReadingScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO: definitely want to wait here before calling get card data
     List<TarotCardData> availableCards = _getCardData();
     return Scaffold(
       appBar: AppBar(
@@ -67,11 +66,10 @@ class Card extends ConsumerWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) => Scaffold(
-                              body: Column(
-                            children: [
-                              cardData.toPanelList(),
-                            ],
-                          ))))
+                              body: SingleChildScrollView(
+                                  child: Column(
+                            children: [cardData.toPanelList()],
+                          )))))
             },
         child: Container(
           child: image,

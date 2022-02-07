@@ -16,7 +16,7 @@ class TarotCardData {
   String? numerology;
   String? elemental;
   String? mythicalSpiritual;
-  List<String>? questionsToAsk;
+  List? questionsToAsk;
   TarotCardData(
       {this.name,
       this.number,
@@ -56,9 +56,9 @@ class TarotCardData {
   ListTile _getBasicDisplayTile(String title, String body) {
     return ListTile(
       title: Text(title,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       subtitle: Text(body,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
     );
   }
 
@@ -68,11 +68,14 @@ class TarotCardData {
     }
     List<Widget> questionsToAskList = [];
     for (var question in questionsToAsk!) {
-      questionsToAskList.add(Text(question,
-          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)));
+      questionsToAskList
+          .add(Align(alignment: Alignment.centerLeft, child: Text(question)));
+      questionsToAskList.add(const Divider());
     }
     return ExpansionTile(
-        title: const Text("Questions to ask"), children: questionsToAskList);
+        title: const Text("Questions to ask",
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        children: questionsToAskList);
   }
 
   ListView toPanelList() {
@@ -94,19 +97,6 @@ class TarotCardData {
             _getBasicDisplayTile("Elemental", elemental ?? ""),
             _getBasicDisplayTile("Mythical/Spiritual", mythicalSpiritual ?? ""),
             _getQuestionsToAsk(),
-            // _getBasicDisplayTile("Questions to ask", questionsToAsk ?? ""),
-
-            // ExpansionTile(
-            //   initiallyExpanded: true,
-            //   title: Text(name?.toUpperCase() ?? '',
-            //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            //   children: <Widget>[
-            //     ListTile(title: Text('Title of the item')),
-            //     ListTile(
-            //       title: Text('Title of the item2'),
-            //     )
-            //   ],
-            // )
           ],
         )
       ],
@@ -134,7 +124,7 @@ class TarotDataProcessor {
         numerology: element["Numerology"],
         elemental: element["Elemental"],
         mythicalSpiritual: element["Mythical/Spiritual"],
-        questionsToAsk: element["Questions To Ask"],
+        questionsToAsk: element["Questions to Ask"],
       ));
     }
   }
