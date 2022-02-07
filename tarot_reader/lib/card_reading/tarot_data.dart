@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 class TarotCardData {
   String? name;
   int? number;
@@ -49,6 +51,66 @@ class TarotCardData {
       'questionsToAsk': questionsToAsk
     };
     return jsonEncode(payloadMap);
+  }
+
+  ListTile _getBasicDisplayTile(String title, String body) {
+    return ListTile(
+      title: Text(title,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      subtitle: Text(body,
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+    );
+  }
+
+  _getQuestionsToAsk() {
+    if (questionsToAsk == null) {
+      return Container();
+    }
+    List<Widget> questionsToAskList = [];
+    for (var question in questionsToAsk!) {
+      questionsToAskList.add(Text(question,
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)));
+    }
+    return ExpansionTile(
+        title: const Text("Questions to ask"), children: questionsToAskList);
+  }
+
+  ListView toPanelList() {
+    return ListView(
+      shrinkWrap: true,
+      children: [
+        Column(
+          children: [
+            _getBasicDisplayTile("Card name", name ?? ""),
+            _getBasicDisplayTile("Number: " + number.toString(), ""),
+            _getBasicDisplayTile("Arcana", arcana ?? ""),
+            _getBasicDisplayTile("Suit", suit ?? ""),
+            // _getBasicDisplayTile("Fortune telling", fortunteTelling ?? ""),
+            // _getBasicDisplayTile("Keywords", keywords ?? ""),
+            // _getBasicDisplayTile("Meanings", meanings ?? ""),
+            _getBasicDisplayTile("Archetype", archetype ?? ""),
+            _getBasicDisplayTile("Hebrew alphabet", hebrewAlphabet ?? ""),
+            _getBasicDisplayTile("Numerology", numerology ?? ""),
+            _getBasicDisplayTile("Elemental", elemental ?? ""),
+            _getBasicDisplayTile("Mythical/Spiritual", mythicalSpiritual ?? ""),
+            _getQuestionsToAsk(),
+            // _getBasicDisplayTile("Questions to ask", questionsToAsk ?? ""),
+
+            // ExpansionTile(
+            //   initiallyExpanded: true,
+            //   title: Text(name?.toUpperCase() ?? '',
+            //       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            //   children: <Widget>[
+            //     ListTile(title: Text('Title of the item')),
+            //     ListTile(
+            //       title: Text('Title of the item2'),
+            //     )
+            //   ],
+            // )
+          ],
+        )
+      ],
+    );
   }
 }
 

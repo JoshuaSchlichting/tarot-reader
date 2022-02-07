@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -52,9 +51,12 @@ class CardDisplay extends StatelessWidget {
 class Card extends ConsumerWidget {
   final Widget image;
   final String title;
-  final String text;
+  final TarotCardData cardData;
   const Card(
-      {Key? key, required this.image, required this.title, required this.text})
+      {Key? key,
+      required this.image,
+      required this.title,
+      required this.cardData})
       : super(key: key);
 
   @override
@@ -64,10 +66,11 @@ class Card extends ConsumerWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => Center(
-                              child: Text(
-                            text,
-                            style: TextStyle(fontSize: 20),
+                      builder: (context) => Scaffold(
+                              body: Column(
+                            children: [
+                              cardData.toPanelList(),
+                            ],
                           ))))
             },
         child: Container(
@@ -99,12 +102,11 @@ class TarotCardFactory {
         rotateAngle = 91.11;
       }
       TarotCardData cardData = _getRandomCardData();
-      ;
       cards.add(Card(
           image: Transform.rotate(
               child: _getCardImage(cardData), angle: rotateAngle),
           title: "TODO: get card titles",
-          text: cardData.toJson()));
+          cardData: cardData));
     }
     _alreadyDrawn = [];
     return cards;
