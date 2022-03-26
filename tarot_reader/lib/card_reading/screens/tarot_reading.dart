@@ -66,10 +66,8 @@ class Card extends ConsumerWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) => Scaffold(
-                              body: SingleChildScrollView(
-                                  child: Column(
-                            children: [cardData.toPanelList()],
-                          )))))
+                            body: cardData.toPanelList(),
+                          )))
             },
         child: Container(
           child: image,
