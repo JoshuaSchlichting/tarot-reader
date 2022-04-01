@@ -2,6 +2,18 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
+class CardDetail {
+  static const String name = "Name";
+  static const String number = 'Number';
+  static const String arcana = "Arcana";
+  static const String suit = "Suit";
+  static const String archetype = "Archetype";
+  static const String hebrewAlphabet = "Hebrew Alphabet";
+  static const String numerology = "Numerology";
+  static const String elemental = "Elemental";
+  static const String mythicalSpiritual = "Mythical/Spiritual";
+}
+
 class TarotCardData {
   String? name;
   int? number;
@@ -50,6 +62,11 @@ class TarotCardData {
       'mythicalSpiritual': mythicalSpiritual,
       'questionsToAsk': questionsToAsk
     };
+    for (var key in payloadMap.keys) {
+      if (payloadMap[key] == null) {
+        payloadMap.remove(key);
+      }
+    }
     return jsonEncode(payloadMap);
   }
 
@@ -79,25 +96,27 @@ class TarotCardData {
   }
 
   ListView toPanelList() {
+    List<Widget> list = [];
+    list.add(_getBasicDisplayTile("Card name", name ?? ""));
+    list.add(_getBasicDisplayTile("Number: " + number.toString(), ""));
+    list.add(_getBasicDisplayTile(CardDetail.arcana, arcana ?? ""));
+    list.add(_getBasicDisplayTile(CardDetail.suit, suit ?? ""));
+    // list.add(_getBasicDisplayTile("Fortune telling", fortunteTelling ?? ""));
+    // list.add(_getBasicDisplayTile("Keywords", keywords ?? ""));
+    // list.add(_getBasicDisplayTile("Meanings", meanings ?? ""));
+    list.add(_getBasicDisplayTile(CardDetail.archetype, archetype ?? ""));
+    list.add(
+        _getBasicDisplayTile(CardDetail.hebrewAlphabet, hebrewAlphabet ?? ""));
+    list.add(_getBasicDisplayTile(CardDetail.numerology, numerology ?? ""));
+    list.add(_getBasicDisplayTile(CardDetail.elemental, elemental ?? ""));
+    list.add(_getBasicDisplayTile(
+        CardDetail.mythicalSpiritual, mythicalSpiritual ?? ""));
+    list.add(_getQuestionsToAsk());
     return ListView(
       shrinkWrap: true,
       children: [
         Column(
-          children: [
-            _getBasicDisplayTile("Card name", name ?? ""),
-            _getBasicDisplayTile("Number: " + number.toString(), ""),
-            _getBasicDisplayTile("Arcana", arcana ?? ""),
-            _getBasicDisplayTile("Suit", suit ?? ""),
-            // _getBasicDisplayTile("Fortune telling", fortunteTelling ?? ""),
-            // _getBasicDisplayTile("Keywords", keywords ?? ""),
-            // _getBasicDisplayTile("Meanings", meanings ?? ""),
-            _getBasicDisplayTile("Archetype", archetype ?? ""),
-            _getBasicDisplayTile("Hebrew alphabet", hebrewAlphabet ?? ""),
-            _getBasicDisplayTile("Numerology", numerology ?? ""),
-            _getBasicDisplayTile("Elemental", elemental ?? ""),
-            _getBasicDisplayTile("Mythical/Spiritual", mythicalSpiritual ?? ""),
-            _getQuestionsToAsk(),
-          ],
+          children: list,
         )
       ],
     );
